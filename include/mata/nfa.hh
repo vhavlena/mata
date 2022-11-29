@@ -38,9 +38,8 @@
 
 namespace Mata
 {
-namespace Nfa
-{
-extern const std::string TYPE_NFA;
+namespace Nfa {
+        extern const std::string TYPE_NFA;
 
 /*TODO: Generally, there are
  * 1) many and messy type names
@@ -55,20 +54,20 @@ extern const std::string TYPE_NFA;
  * some other things as well ...?
  * */
 
-using State = unsigned long;
-using Symbol = unsigned long;
+        using State = unsigned long;
+        using Symbol = unsigned long;
 
-using StateSet = Mata::Util::OrdVector<State>;
-template<typename T> using Set = Mata::Util::OrdVector<T>;
+        using StateSet = Mata::Util::OrdVector<State>;
+        template<typename T> using Set = Mata::Util::OrdVector<T>;
 
-using WordSet = std::set<std::vector<Symbol>>;
-struct Run {
-    std::vector<Symbol> word; ///< A finite-length word.
-    std::vector<State> path; ///< A finite-length path through automaton.
-};
+        using WordSet = std::set<std::vector<Symbol>>;
+        struct Run {
+            std::vector<Symbol> word; ///< A finite-length word.
+            std::vector<State> path; ///< A finite-length path through automaton.
+        };
 
-using StringToStateMap = std::unordered_map<std::string, State>;
-using StringToSymbolMap = std::unordered_map<std::string, Symbol>;
+        using StringToStateMap = std::unordered_map<std::string, State>;
+        using StringToSymbolMap = std::unordered_map<std::string, Symbol>;
 
 /*
  *TODO:
@@ -78,17 +77,17 @@ using StringToSymbolMap = std::unordered_map<std::string, Symbol>;
  * */
 
 
-using StateToStringMap = std::unordered_map<State, std::string>;
+        using StateToStringMap = std::unordered_map<State, std::string>;
 // using StateToPostMap = StateMap<PostSymb>; ///< Transitions.
 /// Mapping of states to states, used, for example, to map original states to reindexed states of new automaton, etc.
-using StateToStateMap = std::unordered_map<State, State>;
+        using StateToStateMap = std::unordered_map<State, State>;
 
-using SymbolToStringMap = std::unordered_map<Symbol, std::string>;
+        using SymbolToStringMap = std::unordered_map<Symbol, std::string>;
 /*TODO: this should become a part of the automaton somehow.
  * It should be a vector indexed by states.
  * */
 
-using StringMap = std::unordered_map<std::string, std::string>;
+        using StringMap = std::unordered_map<std::string, std::string>;
 
 /*TODO: What about to
  * have names Set, UMap/OMap, State, Symbol, Sequence... and name by Set<State>, State<UMap>, ...
@@ -97,116 +96,118 @@ using StringMap = std::unordered_map<std::string, std::string>;
 /**
  * The abstract interface for NFA alphabets.
  */
-class Alphabet {
-public:
-    /// translates a string into a symbol
-    virtual Symbol translate_symb(const std::string& symb) = 0;
+        class Alphabet {
+        public:
+            /// translates a string into a symbol
+            virtual Symbol translate_symb(const std::string &symb) = 0;
 
-    /**
-     * @brief Translate internal @p symbol representation back to its original string name.
-     *
-     * Throws an exception when the @p symbol is missing in the alphabet.
-     * @param[in] symbol Symbol to translate.
-     * @return @p symbol original name.
-     */
-    virtual std::string reverse_translate_symbol(Symbol symbol) const = 0;
+            /**
+             * @brief Translate internal @p symbol representation back to its original string name.
+             *
+             * Throws an exception when the @p symbol is missing in the alphabet.
+             * @param[in] symbol Symbol to translate.
+             * @return @p symbol original name.
+             */
+            virtual std::string reverse_translate_symbol(Symbol symbol) const = 0;
 
-    /// also translates strings to symbols
-    Symbol operator[](const std::string& symb) { return this->translate_symb(symb); }
+            /// also translates strings to symbols
+            Symbol operator[](const std::string &symb) { return this->translate_symb(symb); }
 
-    /**
-     * @brief Get a list of symbols in the alphabet.
-     *
-     * The result does not have to equal the list of symbols in the automaton using this alphabet.
-     * @return // TODO: Finish.
-     */
-    virtual Util::OrdVector<Symbol> get_alphabet_symbols() const
-    { // {{{
-        throw std::runtime_error("Unimplemented");
-    } // }}}
+            /**
+             * @brief Get a list of symbols in the alphabet.
+             *
+             * The result does not have to equal the list of symbols in the automaton using this alphabet.
+             * @return // TODO: Finish.
+             */
+            virtual Util::OrdVector<Symbol> get_alphabet_symbols() const { // {{{
+                throw std::runtime_error("Unimplemented");
+            } // }}}
 
-    /// complement of a set of symbols wrt the alphabet
-    virtual std::list<Symbol> get_complement(const std::set<Symbol>& syms) const
-    { // {{{
-        (void)syms;
-        throw std::runtime_error("Unimplemented");
-    } // }}}
+            /// complement of a set of symbols wrt the alphabet
+            virtual std::list<Symbol> get_complement(const std::set<Symbol> &syms) const { // {{{
+                (void) syms;
+                throw std::runtime_error("Unimplemented");
+            } // }}}
 
-    virtual ~Alphabet() = default;
+            virtual ~Alphabet() = default;
 
-    /**
-     * @brief Check whether two alphabets are equal.
-     *
-     * In general, two alphabets are equal if and only if they are of the same class instance.
-     * @param other_alphabet The other alphabet to compare with for equality.
-     * @return True if equal, false otherwise.
-     */
-    virtual bool is_equal(const Alphabet& other_alphabet) const { return address() == other_alphabet.address(); }
-    /**
-     * @brief Check whether two alphabets are equal.
-     *
-     * In general, two alphabets are equal if and only if they are of the same class instance.
-     * @param other_alphabet The other alphabet to compare with for equality.
-     * @return True if equal, false otherwise.
-     */
-    virtual bool is_equal(const Alphabet* const other_alphabet) const { return address() == other_alphabet->address(); }
+            /**
+             * @brief Check whether two alphabets are equal.
+             *
+             * In general, two alphabets are equal if and only if they are of the same class instance.
+             * @param other_alphabet The other alphabet to compare with for equality.
+             * @return True if equal, false otherwise.
+             */
+            virtual bool is_equal(const Alphabet &other_alphabet) const {
+                return address() == other_alphabet.address();
+            }
 
-    bool operator==(const Alphabet&) const = delete;
+            /**
+             * @brief Check whether two alphabets are equal.
+             *
+             * In general, two alphabets are equal if and only if they are of the same class instance.
+             * @param other_alphabet The other alphabet to compare with for equality.
+             * @return True if equal, false otherwise.
+             */
+            virtual bool is_equal(const Alphabet *const other_alphabet) const {
+                return address() == other_alphabet->address();
+            }
 
-protected:
-    virtual const void* address() const { return this; }
-}; // class Alphabet.
+            bool operator==(const Alphabet &) const = delete;
+
+        protected:
+            virtual const void *address() const { return this; }
+        }; // class Alphabet.
 
 // const PostSymb EMPTY_POST{};
 
-static constexpr struct Limits {
-    State maxState = std::numeric_limits<State>::max();
-    State minState = std::numeric_limits<State>::min();
-    Symbol maxSymbol = std::numeric_limits<Symbol>::max();
-    Symbol minSymbol = std::numeric_limits<Symbol>::min();
-} limits;
+        static constexpr struct Limits {
+            State maxState = std::numeric_limits<State>::max();
+            State minState = std::numeric_limits<State>::min();
+            Symbol maxSymbol = std::numeric_limits<Symbol>::max();
+            Symbol minSymbol = std::numeric_limits<Symbol>::min();
+        } limits;
 
 /*TODO: Ideally remove functions using this struct as a parameter.
  * unpack the trans. relation to transitions is inefficient, goes against the hairs of the library.
  * Do we want to support it?
  */
 /// A transition.
-struct Trans
-{
-	State src;
-	Symbol symb;
-	State tgt;
+        struct Trans {
+            State src;
+            Symbol symb;
+            State tgt;
 
-	Trans() : src(), symb(), tgt() { }
-	Trans(State src, Symbol symb, State tgt) : src(src), symb(symb), tgt(tgt) { }
+            Trans() : src(), symb(), tgt() {}
 
-	bool operator==(const Trans& rhs) const
-	{ // {{{
-		return src == rhs.src && symb == rhs.symb && tgt == rhs.tgt;
-	} // operator== }}}
-	bool operator!=(const Trans& rhs) const { return !this->operator==(rhs); }
-};
+            Trans(State src, Symbol symb, State tgt) : src(src), symb(symb), tgt(tgt) {}
 
-using TransSequence = std::vector<Trans>; ///< Set of transitions.
+            bool operator==(const Trans &rhs) const { // {{{
+                return src == rhs.src && symb == rhs.symb && tgt == rhs.tgt;
+            } // operator== }}}
+            bool operator!=(const Trans &rhs) const { return !this->operator==(rhs); }
+        };
 
-struct Nfa; ///< A non-deterministic finite automaton.
+        using TransSequence = std::vector<Trans>; ///< Set of transitions.
 
-template<typename T> using Sequence = std::vector<T>; ///< A sequence of elements.
-using AutSequence = Sequence<Nfa>; ///< A sequence of non-deterministic finite automata.
+        struct Nfa; ///< A non-deterministic finite automaton.
 
-template<typename T> using RefSequence = Sequence<std::reference_wrapper<T>>; ///< A sequence of references to elements.
-using AutRefSequence = RefSequence<Nfa>; ///< A sequence of references to non-deterministic finite automata.
-using ConstAutRefSequence = RefSequence<const Nfa>; ///< A sequence of const references to non-deterministic finite automata.
+        template<typename T> using Sequence = std::vector<T>; ///< A sequence of elements.
+        using AutSequence = Sequence<Nfa>; ///< A sequence of non-deterministic finite automata.
 
-template<typename T> using PtrSequence = Sequence<T*>; ///< A sequence of pointers to elements.
-using AutPtrSequence = PtrSequence<Nfa>; ///< A sequence of pointers to non-deterministic finite automata.
-using ConstAutPtrSequence = PtrSequence<const Nfa>; ///< A sequence of pointers to const non-deterministic finite automata.
+        template<typename T> using RefSequence = Sequence<std::reference_wrapper<T>>; ///< A sequence of references to elements.
+        using AutRefSequence = RefSequence<Nfa>; ///< A sequence of references to non-deterministic finite automata.
+        using ConstAutRefSequence = RefSequence<const Nfa>; ///< A sequence of const references to non-deterministic finite automata.
 
-template<typename T> using ConstPtrSequence = Sequence<T* const>; ///< A sequence of const pointers to elements.
-using AutConstPtrSequence = ConstPtrSequence<Nfa>; ///< A sequence of const pointers to non-deterministic finite automata.
-using ConstAutConstPtrSequence = ConstPtrSequence<const Nfa>; ///< A sequence of const pointers to const non-deterministic finite automata.
+        template<typename T> using PtrSequence = Sequence<T *>; ///< A sequence of pointers to elements.
+        using AutPtrSequence = PtrSequence<Nfa>; ///< A sequence of pointers to non-deterministic finite automata.
+        using ConstAutPtrSequence = PtrSequence<const Nfa>; ///< A sequence of pointers to const non-deterministic finite automata.
 
-using SharedPtrAut = std::shared_ptr<Nfa>; ///< A shared pointer to NFA.
+        template<typename T> using ConstPtrSequence = Sequence<T *const>; ///< A sequence of const pointers to elements.
+        using AutConstPtrSequence = ConstPtrSequence<Nfa>; ///< A sequence of const pointers to non-deterministic finite automata.
+        using ConstAutConstPtrSequence = ConstPtrSequence<const Nfa>; ///< A sequence of const pointers to const non-deterministic finite automata.
+
+        using SharedPtrAut = std::shared_ptr<Nfa>; ///< A shared pointer to NFA.
 
 /**
 * Direct alphabet (also identity alphabet or integer alphabet) using integers as symbols.
@@ -216,66 +217,73 @@ using SharedPtrAut = std::shared_ptr<Nfa>; ///< A shared pointer to NFA.
 *  will throw exceptions warning about the inappropriate use of IntAlphabet. If one needs these functions, they should
 *  use OnTheFlyAlphabet instead of IntAlphabet.
 */
-class IntAlphabet : public Alphabet {
-public:
-    IntAlphabet(): alphabet_instance(IntAlphabetSingleton::get()) {}
+        class IntAlphabet : public Alphabet {
+        public:
+            IntAlphabet() : alphabet_instance(IntAlphabetSingleton::get()) {}
 
-    Symbol translate_symb(const std::string& symb) override {
-        Symbol symbol;
-        std::istringstream stream(symb);
-        stream >> symbol;
-        return symbol;
-    }
+            Symbol translate_symb(const std::string &symb) override {
+                Symbol symbol;
+                std::istringstream stream(symb);
+                stream >> symbol;
+                return symbol;
+            }
 
-    std::string reverse_translate_symbol(Symbol symbol) const override {
-        return std::to_string(symbol);
-    }
+            std::string reverse_translate_symbol(Symbol symbol) const override {
+                return std::to_string(symbol);
+            }
 
-    Util::OrdVector<Symbol> get_alphabet_symbols() const override {
-        throw std::runtime_error("Nonsensical use of get_alphabet_symbols() on IntAlphabet.");
-    }
+            Util::OrdVector<Symbol> get_alphabet_symbols() const override {
+                throw std::runtime_error("Nonsensical use of get_alphabet_symbols() on IntAlphabet.");
+            }
 
-    std::list<Symbol> get_complement(const std::set<Symbol>& syms) const override {
-        (void)syms;
-        throw std::runtime_error("Nonsensical use of get_alphabet_symbols() on IntAlphabet.");
-    }
+            std::list<Symbol> get_complement(const std::set<Symbol> &syms) const override {
+                (void) syms;
+                throw std::runtime_error("Nonsensical use of get_alphabet_symbols() on IntAlphabet.");
+            }
 
-    IntAlphabet(const IntAlphabet&) = default;
-    IntAlphabet& operator=(const IntAlphabet& int_alphabet) = delete;
-protected:
-    const void* address() const override { return &alphabet_instance; }
-private:
-    /**
-     * Singleton class implementing integer alphabet_instance for class IntAlphabet.
-     *
-     * Users have to use IntAlphabet instead which provides interface identical to other alphabets and can be used in
-     *  places where an instance of the abstract class Alphabet is required.
-     */
-    class IntAlphabetSingleton {
-    public:
-        static IntAlphabetSingleton& get() {
-            static IntAlphabetSingleton alphabet;
-            return alphabet;
-        }
+            IntAlphabet(const IntAlphabet &) = default;
 
-        IntAlphabetSingleton(IntAlphabetSingleton&) = delete;
-        IntAlphabetSingleton(IntAlphabetSingleton&&) = delete;
-        IntAlphabetSingleton& operator=(const IntAlphabetSingleton&) = delete;
-        IntAlphabetSingleton& operator=(IntAlphabetSingleton&&) = delete;
+            IntAlphabet &operator=(const IntAlphabet &int_alphabet) = delete;
 
-        ~IntAlphabetSingleton() = default;
-    protected:
-        IntAlphabetSingleton() = default;
-    }; // class IntAlphabetSingleton.
+        protected:
+            const void *address() const override { return &alphabet_instance; }
 
-    IntAlphabetSingleton& alphabet_instance;
-}; // class IntAlphabet.
+        private:
+            /**
+             * Singleton class implementing integer alphabet_instance for class IntAlphabet.
+             *
+             * Users have to use IntAlphabet instead which provides interface identical to other alphabets and can be used in
+             *  places where an instance of the abstract class Alphabet is required.
+             */
+            class IntAlphabetSingleton {
+            public:
+                static IntAlphabetSingleton &get() {
+                    static IntAlphabetSingleton alphabet;
+                    return alphabet;
+                }
+
+                IntAlphabetSingleton(IntAlphabetSingleton &) = delete;
+
+                IntAlphabetSingleton(IntAlphabetSingleton &&) = delete;
+
+                IntAlphabetSingleton &operator=(const IntAlphabetSingleton &) = delete;
+
+                IntAlphabetSingleton &operator=(IntAlphabetSingleton &&) = delete;
+
+                ~IntAlphabetSingleton() = default;
+
+            protected:
+                IntAlphabetSingleton() = default;
+            }; // class IntAlphabetSingleton.
+
+            IntAlphabetSingleton &alphabet_instance;
+        }; // class IntAlphabet.
 
 /// serializes Nfa into a ParsedSection
-Mata::Parser::ParsedSection serialize(
-	const Nfa&                aut,
-	const SymbolToStringMap*  symbol_map = nullptr,
-	const StateToStringMap*   state_map = nullptr);
+        Mata::Parser::ParsedSection serialize(
+                const Nfa &aut,
+                const SymbolToStringMap *symbol_map = nullptr,
+                const StateToStringMap *state_map = nullptr);
 
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -283,106 +291,324 @@ Mata::Parser::ParsedSection serialize(
 ///////////////////////////////////////////////////////////////////////////////////
 
 // Do it like here, similalry as Ord Vector, or use inheritance, or private inheritance?
-template<class Container, typename Key>
-class IterableContainerWrapper {
-private:
-    Container container;
-public:   // Public data types
-    using iterator = typename Container::iterator;
-    using const_iterator = typename Container::const_iterator;
-    using const_reference = typename Container::const_reference;
+        template<class Container, typename Key>
+        class IterableContainerWrapper {
+        private:
+            Container container;
+        public:   // Public data types
+            using iterator = typename Container::iterator;
+            using const_iterator = typename Container::const_iterator;
+            using const_reference = typename Container::const_reference;
 
 
-    const_iterator find(const Key& key) const;
-    void insert(const Key& x);
-    inline void remove(Key k);
-    void push_back(const Key& k);
-    inline void clear();
-    inline size_t size() const;
-    inline void erase(iterator k);
-    inline bool empty() const;
-    inline const_reference back() const;
-    inline const_iterator begin() const;
-    inline const_iterator end() const;
-    inline iterator begin();
-    inline iterator end();
-    inline const_iterator cbegin() const;
-    inline const_iterator cend() const;
+            const_iterator find(const Key &key) const;
 
-};
+            void insert(const Key &x);
+
+            inline void remove(Key k);
+
+            void push_back(const Key &k);
+
+            inline void clear();
+
+            inline size_t size() const;
+
+            inline void erase(iterator k);
+
+            inline bool empty() const;
+
+            inline const_reference back() const;
+
+            inline const_iterator begin() const;
+
+            inline const_iterator end() const;
+
+            inline iterator begin();
+
+            inline iterator end();
+
+            inline const_iterator cbegin() const;
+
+            inline const_iterator cend() const;
+
+        };
 
 // Class for a unary predicate over numbers, aka a set of numbers.
-// The methods names sometimes view it as a set, sometimes as a predicate.
-// that uses a bit-vector as the primary data structure
-        template<typename Number> class UnaryPredicate {
+// Uses a bit-vector as the primary data structure.
+//
+// If elements_watched is true, it remembers elements in a vector of elements.
+// elements_exact then indicates whether elements contain the exact set of elements or an overapprox.
+// This is needed because remove does not remove from elements, since that would be expensive.
+// If !elements_exact, get_elements must iterate through the vector of elements
+// and remove the removed elements (still linear time, in situ).
+        class StatePredicate {
         private:
             std::vector<bool> predicate;
+            std::vector<State> elements;
+            bool elements_exact = false;
+            bool elements_watched = true;
+            //State _size; could be somewhat useful
 
-            //TODO: actually better implement this also
-            std::vector<Number> elements;
-            bool up_to_date;
-            bool overapproximates;
-            bool update;
+            void prune_elements() {
+                State new_pos = 0;
+                for (State orig_pos = 0; orig_pos < elements.size(); ++orig_pos) {
+                    if (predicate[elements[orig_pos]]) {
+                        elements[new_pos] = elements[orig_pos];
+                        ++new_pos;
+                    }
+                }
+                elements.resize(new_pos);
+                elements_exact = true;
+            }
+
+            void compute_elements() {
+                elements.clear();
+                for (State q = 0; q < predicate.size(); ++q) {
+                    if (predicate[q])
+                        elements.push_back(q);
+                }
+            }
 
         public:
-            UnaryPredicate(Number size = 0, Number value = false) {
-                predicate.assign(size,value);
+            StatePredicate(State size = 0, State value = false, bool watch_elements = false) : elements_watched(
+                    watch_elements) {
+                predicate.assign(size, value);
+                if (elements_watched) {
+                    elements.reserve(size);
+                    for (State q = 0; q < size; ++q)
+                        elements.push_back(q);
+                }
             }
 
-            bool operator[](Number n) {
-                while (predicate.size() < n)
+            void add(State q) {
+                while (predicate.size() < q)
                     predicate.push_back(false);
-
-                return predicate[n];
+                if (elements_watched) {
+                    State q_was_there = predicate[q];
+                    predicate[q] = true;
+                    if (!q_was_there)
+                        elements.push_back(q);
+                } else {
+                    predicate[q] = true;
+                }
             }
 
-            const bool& operator[](Number n) const
-            {
-                if (n>predicate.size())
-                    return false;
+            void remove(State q) {
+                if (q < predicate.size() && predicate[q]) {
+                    predicate[q] = false;
+                    if (elements_watched) {
+                        elements_exact = false;
+                    }
+                }
+            }
+
+            void add(const std::vector<State> &states) {
+                for (State q: states)
+                    add(q);
+            }
+
+            void remove(const std::vector<State> &states) {
+                for (State q: states)
+                    remove(q);
+            }
+
+            void watch_elements() {
+                if (!elements_watched) {
+                    compute_elements();
+                    elements_watched = true;
+                    elements_exact = true;
+                }
+            }
+
+            void dont_watch_elements() {
+                elements_exact = false;
+                elements_watched = false;
+            }
+
+            const std::vector<State> &get_elements() {
+                if (!elements_watched)
+                    compute_elements();
+                else if (!elements_exact) {
+                    prune_elements();
+                }
+                return elements;
+            }
+
+            bool operator[](State q) const {
+                if (q < predicate.size())
+                    return predicate[q];
                 else
-                    return predicate[n];
+                    return false;
             }
 
-            void set(bool value = false,Number max = 0) {
-                for (Number n=0,size = predicate.size(); n < size; ++n)
-                    predicate[n]=value;
-            }
-
-            void set(const std::vector<Number> &vec,bool value = true) {
-                for (Number n: vec)
-                    predicate[n] = value;
-            }
-
-            std::vector<Number> get_elements(bool value=true) {
-                std::vector<bool> result = {};
-                //should we have a member vector (or deque) for this, with reserved size?
-                for (Number n = 0,size = predicate.size(); n < size; ++n) {
-                    if (predicate[n])
-                        result.push_back(n);
+            State size() {
+                if (elements_watched) {
+                    if (!elements_exact)
+                        prune_elements();
+                    return elements.size();
+                } else {
+                    State cnt = 0;
+                    for (State q = 0; q < predicate.size(); ++q) {
+                        if (predicate[q])
+                            cnt++;
+                    }
+                    return cnt;
                 }
-                return result;
-            }
-
-            Number cnt_elements(bool value = true) {
-                Number cnt = 0;
-                for (Number n = 0,size = predicate.size(); n < size; ++n) {
-                    if (predicate[n] == value)
-                        ++cnt;
-                }
-                return cnt;
-            }
-
-            size_t size() {
-                return predicate.size();
             }
 
             void clear() {
                 predicate.clear();
+                elements.clear();
+            }
+
+            void reserve(State n) {
+                predicate.reserve(n);
+                elements.reserve(n);
+            }
+
+            // class Proxy {
+            // private:
+            //     StatePredicate &P;
+            //     State q;
+            // public:
+            //     Proxy(StatePredicate &P, State q) : P(P), q(q) {}
+            //     bool operator= (bool value) {
+            //         if (value) {
+            //             while (P.size() < q)
+            //                 P.predicate.push_back(false);
+            //         }
+            //         if (q < P.predicate.size())
+            //             P.predicate[q] = value;
+            //         return P.predicate[q];
+            //     }
+            // };
+            // Proxy operator[] (State q) { return Proxy(*this, q); }
+
+            //or have [] that only returns values, and have an "add" and "remove" to update;
+
+            //bool operator[](State q) {
+            //    while (predicate.size() < q)
+            //        predicate.push_back(false);
+            //    return predicate[q];
+            //}
+        };
+
+        template <typename Number>
+        class NumberPredicate {
+        private:
+            std::vector<bool> predicate = {};
+            std::vector<State> elements = {};
+            bool elements_exact = false;
+            bool elements_watched = true;
+            //Number _size; could be somewhat useful
+
+            void prune_elements() {
+                Number new_pos = 0;
+                for (Number orig_pos = 0; orig_pos < elements.size(); ++orig_pos) {
+                    if (predicate[elements[orig_pos]]) {
+                        elements[new_pos] = elements[orig_pos];
+                        ++new_pos;
+                    }
+                }
+                elements.resize(new_pos);
+                elements_exact = true;
+            }
+
+            void compute_elements() {
+                elements.clear();
+                for (Number q = 0; q < predicate.size(); ++q) {
+                    if (predicate[q])
+                        elements.push_back(q);
+                }
+            }
+
+        public:
+            NumberPredicate(bool watch_elements = false) : elements_watched(watch_elements) {};
+
+            void add(Number q) {
+                while (predicate.size() < q)
+                    predicate.push_back(false);
+                if (elements_watched) {
+                    Number q_was_there = predicate[q];
+                    predicate[q] = true;
+                    if (!q_was_there)
+                        elements.push_back(q);
+                } else {
+                    predicate[q] = true;
+                }
+            }
+
+            void remove(Number q) {
+                if (q < predicate.size() && predicate[q]) {
+                    predicate[q] = false;
+                    if (elements_watched) {
+                        elements_exact = false;
+                    }
+                }
+            }
+
+            void add(const std::vector<Number> &states) {
+                for (Number q: states)
+                    add(q);
+            }
+
+            void remove(const std::vector<Number> &states) {
+                for (Number q: states)
+                    remove(q);
+            }
+
+            void watch_elements() {
+                if (!elements_watched) {
+                    compute_elements();
+                    elements_watched = true;
+                    elements_exact = true;
+                }
+            }
+
+            void dont_watch_elements() {
+                elements_exact = false;
+                elements_watched = false;
+            }
+
+            const std::vector<Number> &get_elements() {
+                if (!elements_watched)
+                    compute_elements();
+                else if (!elements_exact) {
+                    prune_elements();
+                }
+                return elements;
+            }
+
+            bool operator[](Number q) const {
+                if (q < predicate.size())
+                    return predicate[q];
+                else
+                    return false;
+            }
+
+            Number size() {
+                if (elements_watched) {
+                    if (!elements_exact)
+                        prune_elements();
+                    return elements.size();
+                } else {
+                    Number cnt = 0;
+                    for (Number q = 0; q < predicate.size(); ++q) {
+                        if (predicate[q])
+                            cnt++;
+                    }
+                    return cnt;
+                }
+            }
+
+            void clear() {
+                predicate.clear();
+                elements.clear();
             }
 
             void reserve(Number n) {
                 predicate.reserve(n);
+                elements.reserve(n);
             }
         };
 
