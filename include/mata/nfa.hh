@@ -547,13 +547,13 @@ namespace Nfa {
                 }
             }
 
-            void add(const std::vector<Number> &states) {
-                for (Number q: states)
+            void add(const std::vector<Number> &elems) {
+                for (Number q: elems)
                     add(q);
             }
 
-            void remove(const std::vector<Number> &states) {
-                for (Number q: states)
+            void remove(const std::vector<Number> &elems) {
+                for (Number q: elems)
                     remove(q);
             }
 
@@ -570,7 +570,7 @@ namespace Nfa {
                 elements_watched = false;
             }
 
-            const std::vector<Number> &get_elements() {
+            const std::vector<Number>& get_elements() {
                 if (!elements_watched)
                     compute_elements();
                 else if (!elements_exact) {
