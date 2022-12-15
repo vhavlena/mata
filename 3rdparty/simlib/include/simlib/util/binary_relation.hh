@@ -92,16 +92,6 @@ public:
 		size_ = size;
 	}
 
-	size_t alloc()
-	{
-		if (size_ >= rowSize_)
-		{
-			this->grow(size_ + 1);
-		}
-
-		return size_++;
-	}
-
 	size_t split(size_t i, bool reflexive = true)
 	{
 		assert(i < size_);
