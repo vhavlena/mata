@@ -471,6 +471,40 @@ TEST_CASE("Mata::Nfa::SegNfa::noodlify_for_equation() both sides") {
             }
         }
     }
+
+    SECTION("Simple automata -- regex 2") {
+        Nfa x1, x2, x3, x4, y;
+        create_nfa(&x1, "(a|b|c|d)*");
+        create_nfa(&x2, "abcabcbdbcbdbabdbcbabdbcdadacdddcab");
+        create_nfa(&x3, "abcabcbdbcbdbabdbcbabdbcdadacbabdbbabdddadadabdbdbdbdddddbababaaaa");
+        create_nfa(&x4, "(a|b|c|d)*bababbdbdbdbababdbdbdbdbdba(a|b|c|d)*");
+        create_nfa(&y, "(a|b|c|d)*bababbdbdbdb");
+
+        SegNfa::NoodleSubstSequence noodles = SegNfa::noodlify_for_equation(
+            std::vector<std::shared_ptr<Nfa>>{std::make_shared<Nfa>(x1), std::make_shared<Nfa>(x2), std::make_shared<Nfa>(x1),std::make_shared<Nfa>(x1),std::make_shared<Nfa>(x1),std::make_shared<Nfa>(x3),std::make_shared<Nfa>(x4) }, 
+            std::vector<std::shared_ptr<Nfa>>{std::make_shared<Nfa>(y) });
+        CHECK(false);
+    }
+
+    SECTION("Simple automata -- regex 3") {
+        Nfa x1, x2, x3, x4, y;
+        create_nfa(&x1, "(a|b|c|d)*");
+        create_nfa(&x2, "ab");
+        create_nfa(&x3, "abcab");
+        create_nfa(&x4, "(a|b|c|d)*bad(a|b|c|d)*");
+        create_nfa(&y, "(a|b|c|d)*badb");
+
+        SegNfa::NoodleSubstSequence noodles = SegNfa::noodlify_for_equation(
+            std::vector<std::shared_ptr<Nfa>>{std::make_shared<Nfa>(x1), std::make_shared<Nfa>(x2), std::make_shared<Nfa>(x1),std::make_shared<Nfa>(x1),std::make_shared<Nfa>(x1),std::make_shared<Nfa>(x3),std::make_shared<Nfa>(x4) }, 
+            std::vector<std::shared_ptr<Nfa>>{std::make_shared<Nfa>(y) });
+        std::cout << noodles.size() << std::endl;
+        for(size_t i = 0; i < noodles.size(); i++) {
+            for(size_t j = 0; j < noodles[i].size(); j++) {
+                noodles[i][j].first->print_to_DOT(std::cout);
+            }
+        }
+        CHECK(false);
+    }
 }
 
 TEST_CASE("Mata::Nfa::SegNfa::noodlify_for_equation() for profiling", "[.profiling][noodlify]") {
